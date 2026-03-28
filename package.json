@@ -1,7 +1,19 @@
 {
   "name": "baileysbase",
   "version": "1.0.0",
-  "description": "base para iniciar a crear un bot de whatsapp usando baileys",
+  "description": "Plantilla modular para crear bots de WhatsApp con Baileys",
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "baileys",
+    "whatsapp-bot",
+    "whatsapp-api",
+    "multi-device",
+    "nodejs",
+    "bot-whatsapp",
+    "baileys-md",
+    "bot-maker"
+  ],
   "license": "ISC",
   "author": "DavidModzz",
   "type": "module",
