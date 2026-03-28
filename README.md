@@ -1,25 +1,29 @@
-# Base de Bot con Baileys
+# WhatsApp Bot Base - Baileys
 
-## [Hosting gratuito](https://discord.gg/6TTZtvwX)
-
-## [Canal de WhatsApp](https://whatsapp.com/channel/0029VagSzny6rsR0yY19XY1g)
-
-## Introducción
-
-Esta base proporciona una arquitectura **modular y escalable** para desarrollar bots de WhatsApp con **Baileys**.  
-Su diseño permite **cargar comandos y eventos dinámicamente**, además de ofrecer un sistema de **serialización** que simplifica el manejo de mensajes.
-
-Está pensada para desarrolladores que buscan una estructura sólida, limpia y fácilmente extensible.
+Plantilla modular y lista para usar para crear tu propio bot de WhatsApp con la librería Baileys.
 
 ---
 
-## Requisitos Previos
+## ✨ Características
 
-- **Node.js 18** o superior  
-- **Cuenta de WhatsApp** para enlazar el bot  
-- **Conocimientos básicos de JavaScript (ESM)**
+- **Carga dinámica de comandos** - Añade comandos sin reiniciar el bot
+- **Sistema de eventos** - Manejo completo de mensajes y conexiones
+- **Comandos por categorías** - Organizado en general, grupo, info, tools
+- **Validación automática** - Verifica admin, grupo/DM antes de ejecutar
+- **Serialización de mensajes** - Facilita el manejo de mensajes entrantes
+- **Multi-dispositivo** - Funciona en cualquier dispositivo con Node.js
 
-Instala las dependencias con:
+---
+
+## 📋 Requisitos
+
+- Node.js 18+
+- Cuenta de WhatsApp
+- Conocimientos básicos de JavaScript
+
+---
+
+## 🚀 Instalación
 
 ```bash
 npm install
@@ -27,103 +31,98 @@ npm install
 
 ---
 
-## Estructura de un Comando
+## ⚙️ Configuración
 
-Los comandos se almacenan dentro de `src/commands/<categoria>/`.  
-Ejemplo: `src/commands/fun/saludo.js`
+Edita `src/config.js` para configurar el prefijo:
 
 ```js
+const prefix = "/";
+
 export default {
-  // Información del comando
-  name: "saludo",
-  aliases: ["hola", "hi"],
-  category: "fun",
-  description: "Envía un saludo personalizado.",
-  usage: "[nombre]",
-  example: "saludo David",
-
-  // Parámetros de verificación
-  onlyDm: false,      // true → solo en chats privados
-  onlyGroup: false,   // true → solo en grupos
-  onlyAdmin: false,   // true → requiere que el usuario sea admin
-  botAdmin: false,    // true → requiere que el bot sea admin
-
-  // Lógica del comando
-  async execute(m, { sock, args, isGroupAdmin, isBotAdmin }) {
-    const nombre = args[0] || "amigo";
-    await m.reply(`¡Hola, ${nombre}! 👋`);
-  }
-};
+    prefix
+}
 ```
 
-> 🔹 **Nota:** el loader detecta automáticamente nuevos comandos al iniciar el bot.  
-> No es necesario registrar nada manualmente.
+Crea un archivo `.env` basado en `.env_example` y añade tus API keys.
 
 ---
 
-## Flujo de Verificación Automático
+## 📁 Estructura
 
-Antes de ejecutar cualquier comando, el sistema valida las propiedades de restricción en el evento `messages.upsert`.  
-Esto evita errores y asegura que cada comando se ejecute solo en el contexto permitido.
-
-Ejemplo del flujo de validación:
-
-```js
-if (command?.onlyDm && m.isGroup)
-  return m.reply("❌ Este comando no se puede usar en grupos.");
-
-if (command?.onlyGroup && !m.isGroup)
-  return m.reply("❌ Este comando solo se puede usar en grupos.");
-
-if (command?.onlyAdmin && !isGroupAdmin)
-  return m.reply("❌ Este comando está limitado a administradores.");
-
-if (command?.botAdmin && !isBotAdmin)
-  return m.reply("❌ El bot necesita ser administrador para ejecutar este comando.");
 ```
-
-De esta manera, el desarrollador solo necesita definir las propiedades en el archivo del comando;  
-la lógica de validación es global y no debe repetirse.
-
----
-
-## Ejemplo Completo
-
-Archivo: `src/commands/admin/ban.js`
-
-```js
-export default {
-  name: "ban",
-  aliases: ["kick", "expulsar"],
-  category: "admin",
-  description: "Expulsa a un usuario del grupo.",
-  usage: "@usuario",
-  example: "ban @usuario",
-
-  // Restricciones
-  onlyGroup: true,
-  onlyAdmin: true,
-  botAdmin: true,
-
-  async execute(m, { sock, args }) {
-    const mentioned = m.mentions[0];
-    if (!mentioned) return m.reply("Debes mencionar a un usuario.");
-
-    await sock.groupParticipantsUpdate(m.chat, [mentioned], "remove");
-    await m.reply("Usuario expulsado correctamente.");
-  }
-};
+src/
+├── commands/          # Comandos del bot
+│   ├── general/       # Comandos generales
+│   ├── group/         # Comandos de grupo
+│   ├── info/         # Comandos de información
+│   └── tools/        # Herramientas
+├── events/           # Manejo de eventos
+├── lib/              # Funciones utilities
+│   └── core/         # Nucleo del bot
+└── index.js          # Entry point
 ```
 
 ---
 
-## Ejecución del Bot
+## 💻 Uso
 
-Inicia el bot con:
+Inicia el bot:
 
 ```bash
 node .
 ```
 
-Durante el arranque, se generará un **código de emparejamiento (pairing code)** que deberás ingresar en WhatsApp para vincular la cuenta.  
-Una vez enlazado, el bot estará listo para responder y ejecutar comandos.
+Escanea el código QR con tu WhatsApp y ¡listo!
+
+---
+
+## 📝 Comandos Incluidos
+
+| Comando | Descripción |
+|---------|-------------|
+| `/menu` | Ver todos los comandos disponibles |
+| `/ping` | Verificar si el bot responde |
+| `/ayuda` | Ayuda general |
+| `/owner` | Ver información del owner |
+| `@everyone` | Mencionar a todos en el grupo |
+| `/kick` | Expulsar usuario del grupo |
+| `/qr` | Generar código QR |
+| `/tts` | Texto a voz |
+
+---
+
+## 🔧 Añadir Comandos
+
+Crea un archivo en `src/commands/<categoria>/`:
+
+```js
+export default {
+    name: "comando",
+    aliases: ["alias"],
+    category: "general",
+    description: "Descripción",
+    usage: "[args]",
+    example: "comando arg1",
+
+    async execute(m, { sock, args }) {
+        await m.reply("¡Hola!");
+    }
+};
+```
+
+---
+
+## 📞 Soporte
+
+- Discord: Únete a nuestro servidor
+- Issues: Reporta problemas en GitHub
+
+---
+
+## 📜 Licencia
+
+MIT License
+
+---
+
+⭐️ Dale estrella al proyecto si te fue útil!
